@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RentEase - Home</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .user-info {
+        display: flex;
+        align-items: center;
+      }
+      .user-info span {
+        margin-right: 20px;
+      }
+      .menu {
+        display: flex;
+        gap: 15px;
+      }
+      .menu a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .container {
+        padding: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #f4f4f4;
+      }
+      button {
+        padding: 5px 10px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #d32f2f;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo" id="logo">RentEase</div>
+      <div class="menu">
+        <a href="./allFlats.html">All Flats</a>
+        <a href="./newFlat.html">Add New Flat</a>
+        <a href="./home.html">Home</a>
+      </div>
+      <div class="user-info">
+        <span>Hello, User Full Name</span>
+        <button onclick="logout()">Log Out</button>
+      </div>
+    </header>
+    <div class="container">
+      <h2>Favourite Flats</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>City</th>
+            <th>Price</th>
+            <th>Area Size</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody id="favouriteFlatsTable">
+          <!-- Favourites will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
+    <script>
+      function loadFavourites() {
+        const flats = JSON.parse(localStorage.getItem("flats")) || [];
+        const favourites = flats.filter((flat) => flat.favorite);
+        const tableBody = document.getElementById("favouriteFlatsTable");
+
+        tableBody.innerHTML = "";
+
+        favourites.forEach((flat, index) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+                    <td>${flat.city}</td>
+                    <td>${flat.price}</td>
+                    <td>${flat.area}</td>
+                    <td><button onclick="removeFavourite(${index})">Remove</button></td>
+                `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function removeFavourite(index) {
+        let flats = JSON.parse(localStorage.getItem("flats")) || [];
+        const favouriteIndex = flats.findIndex(
+          (flat, i) => flat.favorite && i === index
+        );
+
+        if (favouriteIndex !== -1) {
+          flats[favouriteIndex].favorite = false;
+          localStorage.setItem("flats", JSON.stringify(flats));
+          loadFavourites();
+        }
+      }
+
+      function logout() {
+        alert("You have been logged out.");
+        window.location.href = "login.html"; // Redirect to login page
+      }
+
+      document.addEventListener("DOMContentLoaded", loadFavourites);
+    </script>
+  </body>
+</html>

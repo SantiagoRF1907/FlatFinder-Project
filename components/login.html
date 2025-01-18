@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RentEase - Login</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      header {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        text-align: center;
+      }
+      .container {
+        padding: 20px;
+        max-width: 400px;
+        margin: auto;
+        text-align: center;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        margin-bottom: 10px;
+      }
+      input {
+        padding: 8px;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .error {
+        color: red;
+        font-size: 12px;
+      }
+      .actions {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>RentEase - Login</h1>
+    </header>
+    <div class="container">
+      <form id="loginForm">
+        <label>
+          Email:
+          <input type="email" id="email" placeholder="Enter email" />
+          <div class="error" id="emailError"></div>
+        </label>
+        <label>
+          Password:
+          <input type="password" id="password" placeholder="Enter password" />
+          <div class="error" id="passwordError"></div>
+        </label>
+        <button type="button" onclick="loginUser()">Login</button>
+      </form>
+      <div class="actions">
+        <p>
+          Not registered yet?
+          <button onclick="redirectToRegister()">Register</button>
+        </p>
+      </div>
+    </div>
+    <script>
+      function loginUser() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        let isValid = true;
+
+        // Email Validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+          document.getElementById("emailError").textContent =
+            "Enter a valid email address.";
+          isValid = false;
+        } else {
+          document.getElementById("emailError").textContent = "";
+        }
+
+        // Password Validation
+        if (!password) {
+          document.getElementById("passwordError").textContent =
+            "Password is required.";
+          isValid = false;
+        } else {
+          document.getElementById("passwordError").textContent = "";
+        }
+
+        if (!isValid) return;
+
+        // Retrieve users from localStorage
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        // Check if email and password match an existing user
+        const user = users.find(
+          (user) => user.email === email && user.password === password
+        );
+
+        if (user) {
+          alert("Login successful! Redirecting...");
+
+          // Start a session timeout (60 minutes)
+          setTimeout(() => {
+            alert("Session expired. Please login again.");
+            window.location.href = "login.html";
+          }, 60 * 60 * 1000); // 60 minutes
+
+          // Redirect to the home page
+          const currentPath = window.location.pathname;
+          const newPath = currentPath.replace("login.html", "home.html");
+          window.location.href = newPath;
+        } else {
+          alert("Invalid email or password. Please try again.");
+        }
+      }
+
+      function redirectToRegister() {
+        const currentPath = window.location.pathname;
+        const newPath = currentPath.replace("login.html", "register.html");
+        window.location.href = newPath;
+      }
+    </script>
+  </body>
+</html>

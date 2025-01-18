@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RentEase - Register</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      header {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        text-align: center;
+      }
+      .container {
+        padding: 20px;
+        max-width: 600px;
+        margin: auto;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        margin-bottom: 10px;
+      }
+      input {
+        padding: 8px;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .error {
+        color: red;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>RentEase - Register</h1>
+    </header>
+    <div class="container">
+      <form id="registerForm">
+        <label>
+          First Name:
+          <input type="text" id="firstName" placeholder="Enter first name" />
+          <div class="error" id="firstNameError"></div>
+        </label>
+        <label>
+          Last Name:
+          <input type="text" id="lastName" placeholder="Enter last name" />
+          <div class="error" id="lastNameError"></div>
+        </label>
+        <label>
+          Email:
+          <input type="email" id="email" placeholder="Enter email" />
+          <div class="error" id="emailError"></div>
+        </label>
+        <label>
+          Date of Birth:
+          <input type="date" id="dob" />
+          <div class="error" id="dobError"></div>
+        </label>
+        <label>
+          Password:
+          <input type="password" id="password" placeholder="Enter password" />
+          <div class="error" id="passwordError"></div>
+        </label>
+        <label>
+          Confirm Password:
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm password"
+          />
+          <div class="error" id="confirmPasswordError"></div>
+        </label>
+        <button type="button" onclick="registerUser()">Register</button>
+      </form>
+    </div>
+    <script>
+      function calculateAge(dob) {
+        const today = new Date();
+        const birthDate = new Date(dob);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+        return age;
+      }
+
+      function registerUser() {
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const dob = document.getElementById("dob").value;
+        const password = document.getElementById("password").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        let isValid = true;
+
+        // First Name Validation
+        if (firstName.length < 2) {
+          document.getElementById("firstNameError").textContent =
+            "First name must be at least 2 characters long.";
+          isValid = false;
+        } else {
+          document.getElementById("firstNameError").textContent = "";
+        }
+
+        // Last Name Validation
+        if (lastName.length < 2) {
+          document.getElementById("lastNameError").textContent =
+            "Last name must be at least 2 characters long.";
+          isValid = false;
+        } else {
+          document.getElementById("lastNameError").textContent = "";
+        }
+
+        // Email Validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+          document.getElementById("emailError").textContent =
+            "Enter a valid email address.";
+          isValid = false;
+        } else {
+          document.getElementById("emailError").textContent = "";
+        }
+
+        // Date of Birth Validation
+        const age = calculateAge(dob);
+        if (isNaN(age) || age < 18 || age > 120) {
+          document.getElementById("dobError").textContent =
+            "Age must be between 18 and 120 years.";
+          isValid = false;
+        } else {
+          document.getElementById("dobError").textContent = "";
+        }
+
+        // Password Validation
+        const passwordPattern =
+          /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{6,}$/;
+        if (!passwordPattern.test(password)) {
+          document.getElementById("passwordError").textContent =
+            "Password must be at least 6 characters and include letters, numbers, and a special character.";
+          isValid = false;
+        } else {
+          document.getElementById("passwordError").textContent = "";
+        }
+
+        // Confirm Password Validation
+        if (password !== confirmPassword) {
+          document.getElementById("confirmPasswordError").textContent =
+            "Passwords do not match.";
+          isValid = false;
+        } else {
+          document.getElementById("confirmPasswordError").textContent = "";
+        }
+
+        if (!isValid) return;
+
+        // Save user to localStorage
+        const user = {
+          firstName,
+          lastName,
+          email,
+          dob,
+          password,
+        };
+
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const emailExists = users.some((u) => u.email === email);
+
+        if (emailExists) {
+          alert("A user with this email already exists. Please log in.");
+          return;
+        }
+
+        users.push(user);
+        localStorage.setItem("users", JSON.stringify(users));
+
+        alert("Registration successful! Redirecting to home page...");
+
+        // Redirect to home page
+        const currentPath = window.location.pathname;
+        const newPath = currentPath.replace("register.html", "home.html");
+        window.location.href = newPath;
+      }
+    </script>
+  </body>
+</html>

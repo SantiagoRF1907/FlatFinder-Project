@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RentEase - Add New Flat</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .menu {
+        display: flex;
+        gap: 15px;
+      }
+      .menu a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .container {
+        padding: 20px;
+        max-width: 600px;
+        margin: auto;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        margin-bottom: 10px;
+      }
+      input {
+        padding: 8px;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .error {
+        color: red;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo" id="logo">RentEase</div>
+      <div class="menu">
+        <a href="./allFlats.html">All Flats</a>
+        <a href="./newFlat.html">Add New Flat</a>
+        <a href="./home.html">Home</a>
+      </div>
+      <div class="user-info">
+        <span>Hello, User Full Name</span>
+        <button onclick="logout()">Log Out</button>
+      </div>
+    </header>
+    <div class="container">
+      <form id="newFlatForm">
+        <label>
+          City:
+          <input type="text" id="city" placeholder="Enter city" />
+          <div class="error" id="cityError"></div>
+        </label>
+        <label>
+          Price:
+          <input type="number" id="price" placeholder="Enter price" />
+          <div class="error" id="priceError"></div>
+        </label>
+        <label>
+          Area Size (sq ft):
+          <input type="number" id="area" placeholder="Enter area size" />
+          <div class="error" id="areaError"></div>
+        </label>
+        <button type="button" onclick="saveFlat()">Save</button>
+      </form>
+    </div>
+    <script>
+      function saveFlat() {
+        const city = document.getElementById("city").value.trim();
+        const price = parseFloat(document.getElementById("price").value.trim());
+        const area = parseFloat(document.getElementById("area").value.trim());
+
+        let isValid = true;
+
+        // Validation
+        if (!city) {
+          document.getElementById("cityError").textContent =
+            "City is required.";
+          isValid = false;
+        } else {
+          document.getElementById("cityError").textContent = "";
+        }
+
+        if (isNaN(price) || price <= 0) {
+          document.getElementById("priceError").textContent =
+            "Valid price is required.";
+          isValid = false;
+        } else {
+          document.getElementById("priceError").textContent = "";
+        }
+
+        if (isNaN(area) || area <= 0) {
+          document.getElementById("areaError").textContent =
+            "Valid area size is required.";
+          isValid = false;
+        } else {
+          document.getElementById("areaError").textContent = "";
+        }
+
+        if (!isValid) return;
+
+        const flat = {
+          city,
+          price,
+          area,
+          favorite: true, // New flat is a favorite by default
+        };
+
+        // Save to localStorage
+        const flats = JSON.parse(localStorage.getItem("flats")) || [];
+        flats.push(flat);
+        localStorage.setItem("flats", JSON.stringify(flats));
+
+        alert("New flat added successfully!");
+
+        // Reset form
+        document.getElementById("newFlatForm").reset();
+      }
+    </script>
+  </body>
+</html>

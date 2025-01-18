@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RentEase - All Flats</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .menu {
+        display: flex;
+        gap: 15px;
+      }
+      .menu a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      th {
+        background-color: #f4f4f4;
+        cursor: pointer;
+      }
+      .filters {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .filters label {
+        display: flex;
+        flex-direction: column;
+        font-size: 14px;
+      }
+      .filters input,
+      .filters select {
+        padding: 5px;
+        font-size: 14px;
+      }
+      .favorite {
+        color: gold;
+        cursor: pointer;
+      }
+      .favorite.inactive {
+        color: gray;
+      }
+      .no-flats {
+        text-align: center;
+        font-size: 18px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo" id="logo">RentEase</div>
+      <div class="menu">
+        <a href="./allFlats.html">All Flats</a>
+        <a href="./newFlat.html">Add New Flat</a>
+        <a href="./home.html">Home</a>
+      </div>
+      <div class="user-info">
+        <span>Hello, User Full Name</span>
+        <button onclick="logout()">Log Out</button>
+      </div>
+    </header>
+    <div class="container">
+      <div class="filters">
+        <label>
+          City:
+          <input type="text" id="filterCity" placeholder="Enter city" />
+        </label>
+        <label>
+          Price Range:
+          <input type="number" id="filterMinPrice" placeholder="Min price" /> -
+          <input type="number" id="filterMaxPrice" placeholder="Max price" />
+        </label>
+        <label>
+          Area Size Range:
+          <input type="number" id="filterMinArea" placeholder="Min area" /> -
+          <input type="number" id="filterMaxArea" placeholder="Max area" />
+        </label>
+        <button onclick="applyFilters()">Apply Filters</button>
+        <button onclick="resetFilters()">Reset Filters</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortTable('city')">City</th>
+            <th onclick="sortTable('price')">Price</th>
+            <th onclick="sortTable('area')">Area Size</th>
+            <th>Favorite</th>
+          </tr>
+        </thead>
+        <tbody id="flatsTable">
+          <!-- Flats will be dynamically added here -->
+        </tbody>
+      </table>
+      <div class="no-flats" id="noFlatsMessage">No flats available.</div>
+    </div>
+    <script>
+      const flats = JSON.parse(localStorage.getItem("flats")) || [];
+
+      function renderFlats() {
+        const tableBody = document.getElementById("flatsTable");
+        const noFlatsMessage = document.getElementById("noFlatsMessage");
+
+        tableBody.innerHTML = "";
+
+        if (flats.length === 0) {
+          noFlatsMessage.style.display = "block";
+          return;
+        }
+
+        noFlatsMessage.style.display = "none";
+
+        flats.forEach((flat, index) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+                    <td>${flat.city}</td>
+                    <td>${flat.price}</td>
+                    <td>${flat.area}</td>
+                    <td><span class="favorite ${
+                      flat.favorite ? "" : "inactive"
+                    }" onclick="toggleFavorite(${index})">&#9733;</span></td>
+                `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function toggleFavorite(index) {
+        flats[index].favorite = !flats[index].favorite;
+        localStorage.setItem("flats", JSON.stringify(flats));
+        renderFlats();
+      }
+
+      function applyFilters() {
+        const city = document.getElementById("filterCity").value.toLowerCase();
+        const minPrice =
+          parseInt(document.getElementById("filterMinPrice").value) || 0;
+        const maxPrice =
+          parseInt(document.getElementById("filterMaxPrice").value) || Infinity;
+        const minArea =
+          parseInt(document.getElementById("filterMinArea").value) || 0;
+        const maxArea =
+          parseInt(document.getElementById("filterMaxArea").value) || Infinity;
+
+        const filteredFlats = flats.filter((flat) => {
+          return (
+            flat.city.toLowerCase().includes(city) &&
+            flat.price >= minPrice &&
+            flat.price <= maxPrice &&
+            flat.area >= minArea &&
+            flat.area <= maxArea
+          );
+        });
+
+        renderFilteredFlats(filteredFlats);
+      }
+
+      function renderFilteredFlats(filteredFlats) {
+        const tableBody = document.getElementById("flatsTable");
+        tableBody.innerHTML = "";
+
+        if (filteredFlats.length === 0) {
+          document.getElementById("noFlatsMessage").style.display = "block";
+          return;
+        }
+
+        document.getElementById("noFlatsMessage").style.display = "none";
+
+        filteredFlats.forEach((flat, index) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+                    <td>${flat.city}</td>
+                    <td>${flat.price}</td>
+                    <td>${flat.area}</td>
+                    <td><span class="favorite ${
+                      flat.favorite ? "" : "inactive"
+                    }" onclick="toggleFavorite(${index})">&#9733;</span></td>
+                `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function resetFilters() {
+        document.getElementById("filterCity").value = "";
+        document.getElementById("filterMinPrice").value = "";
+        document.getElementById("filterMaxPrice").value = "";
+        document.getElementById("filterMinArea").value = "";
+        document.getElementById("filterMaxArea").value = "";
+        renderFlats();
+      }
+
+      function sortTable(column) {
+        flats.sort((a, b) => {
+          if (a[column] < b[column]) return -1;
+          if (a[column] > b[column]) return 1;
+          return 0;
+        });
+
+        localStorage.setItem("flats", JSON.stringify(flats));
+        renderFlats();
+      }
+
+      renderFlats();
+    </script>
+  </body>
+</html>
